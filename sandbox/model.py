@@ -33,6 +33,7 @@ def lnprior(theta):
     if (-1. < log_mass < 1. and 5. < log_age < 8.
         and 1300 < dist < 1500 and 2 < a0 < 12):
         #return 0.0
+        # Question for Geert: what is being returned here and why?
         return -(dist-1400.)**2 / (10.**2)
     return -np.inf
 
@@ -51,6 +52,7 @@ def lnprob(theta, photom, photom_icov):
 
 def report(sampler):
     """Prints the result to the screen in human-readable format."""
+    # Question for Geert: Can we get this to write out medians instead of means?
     log.info('logMass = {0:.2f} +/- {1:.2f}'
                  .format(sampler.flatchain[:,0].mean(),
                          sampler.flatchain[:,0].std()))
@@ -79,7 +81,7 @@ if __name__ == '__main__':
                                     threads=10)
 
     # Create random starting values and sample
-    p0 = [np.array([0.0, 6.0, 1500, 6.]) + np.random.rand(ndim)
+    p0 = [np.array([0.0, 6.0, 1400, 5.5]) + np.random.rand(ndim)
           for i in range(nwalkers)]
     sampler.run_mcmc(p0, nsamples)
 
