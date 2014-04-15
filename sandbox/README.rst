@@ -10,6 +10,7 @@ Currently the code does:
 - Compares these to Siess isochrones
 - Outputs stellar mass and age, distance and extinction
 - Current priors:
+
   + Mass between 0.1 and 10
   + Age between 0.1 and 100 Myr
   + Distance between 1300 and 1500 pc
