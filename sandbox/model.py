@@ -6,6 +6,7 @@ import triangle
 from astropy import log
 from astropy.io import fits
 from scipy.interpolate.rbf import Rbf
+from astropy.table import Table
 
 siess = fits.getdata("siess_isochrones.fits", 1)
 
@@ -70,25 +71,37 @@ def report(sampler):
 
 
 if __name__ == '__main__':
+
+    count = 0
+
     # Data being fitted:
-    photom = np.array([18.583, 16.896, 15.036])  # [r, i, J]
-    photom_icov = 1. / 0.05*np.eye(3)  # inverse covariance matrix
+    data = Table.read("X_OIR_catalog_v16Jan2014.fits")
+    for star in data:
+        if star["ID_IPHAS"] > 0 and star["ID_UK"] > 0:
+            count = count + 1
+            print "Doing star ID " + str(star["ID"])
 
-    # Setup the sampler
-    ndim, nwalkers, nsamples = 4, 100, 10000
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, 
-                                    args=([photom, photom_icov]),
-                                    threads=10)
+            photom = np.array([star["MAGR_IP"], star["MAGI_IP"], star["MAGJ"]])  # [r, i, J]
+            #photom = np.array([18.583, 16.896, 15.036])  # [r, i, J]
+            print "Photometry: " + str(photom)
+            photom_icov = 1. / 0.05*np.eye(3)  # inverse covariance matrix
 
-    # Create random starting values and sample
-    p0 = [np.array([0.0, 6.0, 1400, 5.5]) + np.random.rand(ndim)
-          for i in range(nwalkers)]
-    sampler.run_mcmc(p0, nsamples)
+            # Setup the sampler
+            ndim, nwalkers, nsamples = 4, 100, 100
+            sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, 
+                                            args=([photom, photom_icov]),
+                                            threads=10)
 
-    # Report and plot the results
-    report(sampler)
-    figure = triangle.corner(sampler.flatchain[1000:], 
-                             show_titles=True,
-                             quantiles=[0.16, 0.5, 0.84],
-                             labels=[r"$\log M$", r"$\log \tau$", r"$d$", r"$A_0$"])
-    figure.savefig("triangle.pdf")
+            # Create random starting values and sample
+            p0 = [np.array([0.0, 6.0, 1400, 5.5]) + np.random.rand(ndim)
+                  for i in range(nwalkers)]
+            sampler.run_mcmc(p0, nsamples)
+
+            # Report and plot the results
+            report(sampler)
+            figure = triangle.corner(sampler.flatchain[10:], 
+                                     show_titles=True,
+                                     quantiles=[0.16, 0.5, 0.84],
+                                     labels=[r"$\log M$", r"$\log \tau$", r"$d$", r"$A_0$"])
+            figure.savefig("triangle.pdf")
+
