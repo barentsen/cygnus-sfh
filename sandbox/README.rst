@@ -11,7 +11,16 @@ Currently the code does:
 - Outputs stellar mass and age, distance and extinction
 - Current priors:
 
-  + Mass between 0.1 and 10
+  + Mass between 0.1 and 10 Msun
   + Age between 0.1 and 100 Myr
   + Distance between 1300 and 1500 pc
   + Extinction between A0 = 2 and 12 mags
+
+- Uses the emcee code to do the MCMC sampling
+- Then outputs means and standard deviations, writes these to the screen and produces a triangle plot
+
+
+Things to do
+------------
+
+- 
